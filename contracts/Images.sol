@@ -1,8 +1,9 @@
 pragma solidity ^0.4.18;
 
-import './zeppelin/ownership/Ownable.sol';
+/* import './zeppelin/ownership/Ownable.sol'; */
 
-contract Image is Ownable{
+/* contract Images is Ownable{ */
+contract Images {
 
   event ImageRequested(address _addr, string _ipfs_hash);
   event ImageUploaded(address _addr, string _ipfs_hash);
@@ -17,6 +18,12 @@ contract Image is Ownable{
   mapping (string => Image) private hash_to_image;
   Image[] public public_images;
   Image[] private all_images;
+  string public hello;
+
+  // constructor just for test purposes
+  function Images() {
+    hello = "hello";
+  }
 
   function createNewImage(string _ipfs_hash, bool _is_public) returns (bool) {
     Image memory new_image = Image({
@@ -28,6 +35,7 @@ contract Image is Ownable{
     all_images.push(new_image);
     address_to_image[msg.sender] = new_image;
     hash_to_image[_ipfs_hash] = new_image;
+    ImageUploaded(msg.sender, _ipfs_hash);
 
     // only if image is public, add it to public images
     if (_is_public) {
