@@ -1,0 +1,143 @@
+/********************************************
+***************** ~GLOBALS~ *****************
+********************************************/
+body {
+  font-family: Helvetica, sans-serif;
+}
+ul {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/********************************************
+******************* ~MAIN~ ******************
+********************************************/
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  background: black;
+  color: white;
+}
+
+.navbar .menu {
+  display: flex;
+}
+
+
+/********************************************
+***************** ~GALLERY~ *****************
+********************************************/
+
+.image-grid {
+  display: flex;
+  justify-content: space-around;  
+  flex-wrap: wrap;
+  width: 100%;
+  height: 100%;
+}
+
+.image-grid .image {
+  width: 33vw;
+  height: 33vw;
+  margin: .125vw 0;
+  object-fit: contain;
+  display: flex;
+  position: relative;
+}
+
+.image img {
+  width: 100%;
+  height: 100%;
+}
+
+/********************************************
+************** ~IMAGE DETAIL~ ***************
+********************************************/
+
+.image-detail-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  width: 70vw;
+  height: 70vh;
+  left: 15vw;
+  top: 15vw;
+  overflow: scroll;
+  border: 1px solid black;
+  background: white;
+}
+
+.image-detail-modal .wrapper {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
+  padding: 10vw;  
+}
+
+.image-detail-img {
+  width: 80%;
+}
+
+.close-x {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+}
+
+.toggle .switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.toggle .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.toggle .slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.toggle input {
+  margin-left: 20px;
+}
+
+.toggle input:checked+.slider {
+  background-color: darkgrey;
+}
+
+.toggle input:focus+.slider {
+  box-shadow: 0 0 1px darkgrey;
+}
+
+.toggle input:checked+.slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
