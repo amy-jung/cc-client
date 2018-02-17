@@ -11,6 +11,7 @@ contract Images is RBAC, Authentication {
   string public constant ROLE_CREATOR = "creator"; // someone who owns an image
   string public constant ROLE_PATRON = "patron"; // someone who wants to use an image
 
+  // meaning only folks with accounts created can call functions
   modifier onlyCreatorOrPatron() {
     require(
       hasRole(msg.sender, ROLE_CREATOR) || hasRole(msg.sender, ROLE_PATRON)
@@ -29,87 +30,114 @@ contract Images is RBAC, Authentication {
   }
 
   // EVENTS WHICH WE MUST LISTEN FOR //
-  event ImageRequested(address _addr, string _ipfs_hash);
-  event ImageUploaded(address _addr, string _ipfs_hash);
-
+  event ImageRequested(address imageOwner, bytes32 ipfsHash);
+  event ImageUploaded(address imageOwner, bytes32 ipfsHash);
+  event ImageApproved(address imageRequester, bytes32 ipfsHash);
+  event ImageDenied(address imageRequester, bytes32 ipfsHash);
 
   // IMAGE INFORMATION STORAGE LAYER //
   struct Image {
+    bool exists;
     address owner;
-    string ipfs_hash;
-    bool is_public;
-    address[] allowed_users;
+    bytes32 ipfsHash;
+    bool isPublic;
+    address[] allowedUsers;
+    bytes32 tag;
+    uint numberOfRequests;
   }
 
-  // access the image by who uploaded it
-  mapping (address => Image[]) private address_to_images;
-  // access the image by its ipfs hash
-  mapping (string => Image) private hash_to_image;
+  // DATA WE MUST ACCESS //
+  // 1. addresses of all public images
+  bytes32[] public publicImages;
+  // 2. all images for a CREATOR
+  mapping (address => bytes32[]) public creatorsPublicImages;
 
-  Image[] public public_images;
-  Image[] private all_images;
+  function imagesForCreator(address _addr) returns (bytes32[]) {
+    return creatorsPublicImages[_addr];
+  }
+
+  // 3. all images a PATRON can use
+  mapping (address => bytes32[]) public patronPermittedImages;
+
+  function allowedImagesForPatron(address _addr) returns ( bytes32[]) {
+    return patronPermittedImages[_addr];
+  }
+
+  // 4. all tags mapped to images
+  mapping (bytes32 => bytes32[]) public tagToImages;
+
+  function imagesForTag(bytes32 tag) returns ( bytes32[]) {
+    return tagToImages[tag];
+  }
+
+  // INTERNAL ACCESS POINTS //
+  mapping (address => Image[]) private creatorAddressToImages;
+  // access the image by its ipfs hash
+  mapping (bytes32 => Image) private hashToImage;
 
   function numberOfImages() returns (uint) {
-    return all_images.length;
+    return publicImages.length;
   }
 
-  // just for testing right now
-  string public hello;
-
-  // constructor just for test purposes
+  // constructor function with all the needed roles
   function Images() {
     addRole(msg.sender, ROLE_CREATOR);
     addRole(msg.sender, ROLE_PATRON);
     addRole(msg.sender, ROLE_ADMIN);
-    hello = "hello. it works.";
   }
 
-  function createNewImage(string _ipfs_hash, bool _is_public) returns (bool) {
-    address[] memory empty_array; // at first, no one is authorized
-    Image memory new_image = Image(msg.sender, _ipfs_hash, _is_public, empty_array);
+  function createNewImage(bytes32 _ipfsHash, bool _isPublic, bytes32 _tag) returns (bool) {
+    if (hashToImage[_ipfsHash].exists) {
+      return false;
+    }
 
-    all_images.push(new_image);
-    address_to_images[msg.sender].push(new_image);
-    hash_to_image[_ipfs_hash] = new_image;
-    ImageUploaded(msg.sender, _ipfs_hash);
+    address[] storage emptyArray; // at first, no one is authorized
+
+    creatorAddressToImages[msg.sender].push(Image(true, msg.sender, _ipfsHash, _isPublic, emptyArray, _tag, 0));
+    hashToImage[_ipfsHash] = Image(true, msg.sender, _ipfsHash, _isPublic, emptyArray, _tag, 0);
+    ImageUploaded(msg.sender, _ipfsHash);
     addRole(msg.sender, ROLE_CREATOR);
 
     // only if image is public, add it to public images
-    if (_is_public) {
-      public_images.push(new_image);
+    if (_isPublic) {
+      publicImages.push(_ipfsHash);
+      creatorsPublicImages[msg.sender].push(_ipfsHash);
       return true;
     }
 
-    // TODO case check for when image cannot be created
+    // TODO case check for when image cannot be created?
     return true;
   }
 
   // allow the CREATOR to change whether an image is public
-  function editImage(string _ipfs_hash, bool _is_public) onlyCreator returns (bool) {
-    require (hash_to_image[_ipfs_hash].owner == msg.sender );
-    hash_to_image[_ipfs_hash].is_public = _is_public;
+  function editImage(bytes32 _ipfsHash, bool isPublic) onlyCreator returns (bool) {
+    require (hashToImage[_ipfsHash].owner == msg.sender );
+    hashToImage[_ipfsHash].isPublic = isPublic;
   }
 
   // A Patron will request to use a certain image, triggering event for Creator
-  function requestImageUse(string _ipfs_hash) {
+  function requestImageUse(bytes32 _ipfsHash) {
     addRole(msg.sender, ROLE_PATRON);
-    ImageRequested(hash_to_image[_ipfs_hash].owner, _ipfs_hash);
+    ImageRequested(hashToImage[_ipfsHash].owner, _ipfsHash);
   }
 
-  function allowImageRequest(string _ipfs_hash, bool decision, address requestor) onlyCreator returns (bool) {
-    require (hash_to_image[_ipfs_hash].owner == msg.sender );
-    hash_to_image[_ipfs_hash].allowed_users.push(requestor);
-    return true;
+  function imageRequestDecision(bytes32 _ipfsHash, bool decision, address requester) onlyCreator returns (bool) {
+    require (hashToImage[_ipfsHash].owner == msg.sender );
+
+    if (decision) {
+      patronPermittedImages[requester].push(_ipfsHash);
+      hashToImage[_ipfsHash].allowedUsers.push(requester);
+      ImageApproved(requester, _ipfsHash);
+      return true;
+    } else {
+      ImageDenied(requester, _ipfsHash);
+    }
   }
 
 
   // This can't be done at all I think
-  function imagesForAddress(address _address) private returns (Image[]) {
-    return address_to_images[_address];
-  }
-
-  function imageForHash(string _hash) private returns (Image) {
-    return hash_to_image[_hash];
-  }
+  /* function imagesForAddress(address _address) public returns (bytes32[]) {
+    return creatorAddressToImages[_address].ipfsHash;
+  } */
 
 }
