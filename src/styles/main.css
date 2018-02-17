@@ -1,0 +1,56 @@
+/********************************************
+***************** ~GLOBALS~ *****************
+********************************************/
+body {
+  font-family: Helvetica, sans-serif;
+}
+ul {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/********************************************
+******************* ~MAIN~ ******************
+********************************************/
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  background: black;
+  color: white;
+}
+
+.navbar .menu {
+  display: flex;
+}
+
+
+/********************************************
+***************** ~GALLERY~ *****************
+********************************************/
+
+.image-grid {
+  display: flex;
+  justify-content: space-around;  
+  flex-wrap: wrap;
+  width: 100%;
+  height: 100%;
+}
+
+.image {
+  width: 33vw;
+  height: 33vw;
+  margin: .125vw 0;
+  object-fit: contain;
+  display: flex;
+  position: relative;
+}
+
+.image img {
+  width: 100%;
+  height: 100%;
+}
