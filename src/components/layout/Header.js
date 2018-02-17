@@ -19,7 +19,7 @@ export default () => {
   const OnlyGuestLinks = HiddenOnlyAuth(() =>
     <span>
       <li className="pure-menu-item">
-        <Link to="/signup" className="pure-menu-link">Sign Up</Link>
+        <Link to="/login" className="pure-menu-link">Sign Up</Link>
       </li>
       <LoginButtonContainer />
     </span>
