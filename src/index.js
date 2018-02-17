@@ -11,6 +11,7 @@ import Home from './pages/UnAuth/Home'
 import Login from './pages/UnAuth/Login'
 import Profile from './pages/Auth/Profile'
 import Inbox from './pages/Auth/Inbox'
+import Upload from './pages/Auth/Upload'
 
 import Store from './utils/redux/Store'
 
@@ -31,6 +32,7 @@ ReactDOM.render((
           <IndexRoute component={Home} />
           <Route path="profile" component={UserIsAuthenticated(Profile)} />
           <Route path="inbox" component={UserIsAuthenticated(Inbox)} />
+          <Route path="upload" component={UserIsAuthenticated(Upload)} />
           <Route path="login" component={UserIsNotAuthenticated(Login)} />
           {/* <Route path="login" component={UserIsNotAuthenticated(Login)} /> */}
         </Route>

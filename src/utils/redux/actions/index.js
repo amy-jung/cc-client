@@ -3,7 +3,8 @@ import {
   UPLOAD_IMAGE,
   USER_LOGGED_IN,
   IMAGE_PUBLIC_STATUS,
-  FUZZY_SEARCH
+  FUZZY_SEARCH,
+  SET_ACTIVE_IMAGE
 } from './types'
 
 // GALLERY
@@ -19,6 +20,13 @@ export const fuzzySearch = term => async dispatch => {
   dispatch({
     type: FUZZY_SEARCH,
     payload: term
+  })
+}
+
+export const setActiveImage = image => async dispatch => {
+  dispatch({
+    type: SET_ACTIVE_IMAGE,
+    payload: image
   })
 }
 

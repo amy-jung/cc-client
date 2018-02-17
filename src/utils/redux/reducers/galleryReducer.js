@@ -1,11 +1,13 @@
 import {
   SET_GALLERY_FILTER,
-  IMAGE_PUBLIC_STATUS
+  IMAGE_PUBLIC_STATUS,
+  SET_ACTIVE_IMAGE
 } from '../actions/types'
 
 const initialState = {
   filter: '',
-  activeImagePublicStatus: false
+  activeImagePublicStatus: false,
+  activeImage: ''
 }
 
 export default function galleryReducer(state = initialState, action){
@@ -23,6 +25,11 @@ export default function galleryReducer(state = initialState, action){
         const status = 'get public status via contract'
         newState.activeImagePublicStatus = status
       }
+      return newState
+    }
+    case SET_ACTIVE_IMAGE : {
+      const newState = { ...state }
+      newState.activeImage = action.payload
       return newState
     }
     default:

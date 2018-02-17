@@ -13,7 +13,6 @@ export function loginUser() {
 
   // Double-check web3's status.
   if (typeof web3 !== 'undefined') {
-
     return function(dispatch) {
       // Using truffle-contract we create the authentication object.
       const authentication = contract(AuthenticationContract)

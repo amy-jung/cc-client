@@ -1,6 +1,6 @@
 import React from 'react'
-import  Toggle  from 'react-input-toggle';
-import 'react-input-toggle/dist/react-input-toggle.css';
+// import  Toggle  from 'react-input-toggle';
+// import 'react-input-toggle/dist/react-input-toggle.css';
  
 const ImageIsPublicToggle = ({ toggle, isPublic }) =>  {
   const handleToggle = (e) => {
@@ -8,9 +8,13 @@ const ImageIsPublicToggle = ({ toggle, isPublic }) =>  {
     toggle(checkedVal)
   }
   return (
-    <div>
+    <div className='toggle'>
       <div>Would you like this image to appear publicly?</div>
-      <Toggle checked={isPublic} onChange={handleToggle} label={'PublicToggle'} effect={'sierra'} labelPosition={'right'} />
+      {/* <Toggle checked={isPublic} onChange={handleToggle} label={'PublicToggle'} effect={'sierra'} labelPosition={'right'} /> */}
+      <label className='switch'>
+        <input type='checkbox' />
+        <span className='slider'></span>
+      </label>
     </div>
   )
 }
