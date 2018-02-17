@@ -2,7 +2,6 @@ pragma solidity ^0.4.18;
 
 import "./Roles.sol";
 
-
 /**
  * @title RBAC (Role-Based Access Control)
  * @author Matt Condon (@Shrugs)
@@ -26,9 +25,7 @@ contract RBAC {
    * A constant role name for indicating admins.
    */
   string public constant ROLE_ADMIN = "admin";
-  string public constant ROLE_RENTER = "renter";
-  string public constant ROLE_CREATOR = "creator";
-
+  
   /**
    * @dev constructor. Sets msg.sender as admin by default
    */

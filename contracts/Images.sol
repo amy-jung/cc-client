@@ -1,57 +1,111 @@
 pragma solidity ^0.4.18;
 
-/* import './zeppelin/ownership/Ownable.sol'; */
+import './zeppelin/ownership/RBAC.sol';
+import './Authentication.sol';
 
-/* contract Images is Ownable{ */
-contract Images {
+contract Images is RBAC, Authentication {
 
+  // ROLE BASED ACCESS CONTROL ///
+
+  // there are two roles within our Dapp, plus admin in the Zeppelin contract
+  string public constant ROLE_CREATOR = "creator"; // someone who owns an image
+  string public constant ROLE_PATRON = "patron"; // someone who wants to use an image
+
+  modifier onlyCreatorOrPatron() {
+    require(
+      hasRole(msg.sender, ROLE_CREATOR) || hasRole(msg.sender, ROLE_PATRON)
+    );
+    _;
+  }
+
+  modifier onlyCreator() {
+    require(hasRole(msg.sender, ROLE_CREATOR));
+    _;
+  }
+
+  modifier onlyPatron() {
+    require(hasRole(msg.sender, ROLE_PATRON));
+    _;
+  }
+
+  // EVENTS WHICH WE MUST LISTEN FOR //
   event ImageRequested(address _addr, string _ipfs_hash);
   event ImageUploaded(address _addr, string _ipfs_hash);
 
+
+  // IMAGE INFORMATION STORAGE LAYER //
   struct Image {
     address owner;
     string ipfs_hash;
     bool is_public;
+    address[] allowed_users;
   }
 
-  mapping (address => Image) private address_to_image;
+  // access the image by who uploaded it
+  mapping (address => Image[]) private address_to_images;
+  // access the image by its ipfs hash
   mapping (string => Image) private hash_to_image;
+
   Image[] public public_images;
   Image[] private all_images;
+
+  // just for testing right now
   string public hello;
 
   // constructor just for test purposes
   function Images() {
-    hello = "hello";
+    addRole(msg.sender, ROLE_CREATOR);
+    addRole(msg.sender, ROLE_PATRON);
+    addRole(msg.sender, ROLE_ADMIN);
+    hello = "hello. it works.";
   }
 
   function createNewImage(string _ipfs_hash, bool _is_public) returns (bool) {
-    Image memory new_image = Image({
-      owner: msg.sender,
-      ipfs_hash: _ipfs_hash,
-      is_public: _is_public
-    });
+    address[] memory empty_array; // at first, no one is authorized
+    Image memory new_image = Image(msg.sender, _ipfs_hash, _is_public, empty_array);
 
     all_images.push(new_image);
-    address_to_image[msg.sender] = new_image;
+    address_to_images[msg.sender].push(new_image);
     hash_to_image[_ipfs_hash] = new_image;
     ImageUploaded(msg.sender, _ipfs_hash);
+    addRole(msg.sender, ROLE_CREATOR);
 
     // only if image is public, add it to public images
     if (_is_public) {
       public_images.push(new_image);
       return true;
     }
+
+    // TODO case check for when image cannot be created
+    return true;
   }
 
-  function imageForAddress(address _address) returns (Image) {
-    return address_to_image[_address];
+  // allow the CREATOR to change whether an image is public
+  function editImage(string _ipfs_hash, bool _is_public) onlyCreator returns (bool) {
+    require (hash_to_image[_ipfs_hash].owner == msg.sender );
+    hash_to_image[_ipfs_hash].is_public = _is_public;
   }
 
-  function imageForHash(string _hash) returns (Image) {
+  // A Patron will request to use a certain image, triggering event for Creator
+  function requestImageUse(string _ipfs_hash) {
+    addRole(msg.sender, ROLE_PATRON);
+    ImageRequested(hash_to_image[_ipfs_hash].owner, _ipfs_hash);
+  }
+
+  function allowImageRequest(string _ipfs_hash, bool decision, address requestor) onlyCreator returns (bool) {
+    require (hash_to_image[_ipfs_hash].owner == msg.sender );
+    hash_to_image[_ipfs_hash].allowed_users.push(requestor);
+    return true;
+  }
+
+
+  // TODO this should be all images for an address, right?
+  function imagesForAddress(address _address) private returns (Image[]) {
+    return address_to_images[_address];
+  }
+
+  function imageForHash(string _hash) private returns (Image) {
     return hash_to_image[_hash];
   }
-
-  // a user requests permission to use an image
 
 }
