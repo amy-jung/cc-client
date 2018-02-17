@@ -41,7 +41,7 @@ a {
   height: 100%;
 }
 
-.image {
+.image-grid .image {
   width: 33vw;
   height: 33vw;
   margin: .125vw 0;

@@ -1,23 +1,27 @@
+import { USER_LOGGED_IN, USER_UPDATED, USER_LOGGED_OUT } from '../actions/types'
+
 const initialState = {
   data: null
 }
 
-const userReducer = (state = initialState, action) => {
-  if (action.type === 'USER_LOGGED_IN' || action.type === 'USER_UPDATED')
-  {
-    return Object.assign({}, state, {
-      data: action.payload
-    })
+export default function userReducer(state = initialState, action) {
+  switch (action.type) {
+    case USER_LOGGED_IN : {
+      const newState = { ...state }
+      newState.data = action.payload
+      return newState
+    }
+    case USER_UPDATED : {
+      const newState = { ...state }
+      newState.data = action.payload
+      return newState
+    }
+    case USER_LOGGED_OUT : {
+      const newState = { ...state }
+      newState.data = null
+      return newState
+    }
+    default:
+      return state
   }
-
-  if (action.type === 'USER_LOGGED_OUT')
-  {
-    return Object.assign({}, state, {
-      data: null
-    })
-  }
-
-  return state
 }
-
-export default userReducer

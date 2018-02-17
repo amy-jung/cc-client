@@ -1,4 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { updateUser } from '../../utils/actions'
 import { binder } from '../../utils/'
 
 class AccountDetails extends Component {
@@ -17,17 +19,30 @@ class AccountDetails extends Component {
 
   handleSubmit (e) {
     e.preventDefault()
-    // do a thing with this.state
+    this.props.onUpdateUser(this.state)
   }
 
   render() {
     return (
       <div>
-        <input name='name' placeholder='name' />
-        <input name='bio' placeholder='bio' />
-        <div class='submit-btn'></div>
+        <form onSubmit={this.handleSubmit}>
+          <input name='name' placeholder='name' />
+          <input name='bio' placeholder='bio' />
+          <button type='submit' class='submit-btn'>Submit</button>
+        </form>
       </div>
     );
   }
 }
-export default AccountDetails;
+
+function mapStateToProps(state) {
+  return {}
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onUpdateUser: userData => dispatch(updateUser(userData))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AccountDetails)
