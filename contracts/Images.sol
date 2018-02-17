@@ -49,6 +49,10 @@ contract Images is RBAC, Authentication {
   Image[] public public_images;
   Image[] private all_images;
 
+  function numberOfImages() returns (uint) {
+    return all_images.length;
+  }
+
   // just for testing right now
   string public hello;
 
@@ -99,7 +103,7 @@ contract Images is RBAC, Authentication {
   }
 
 
-  // TODO this should be all images for an address, right?
+  // This can't be done at all I think
   function imagesForAddress(address _address) private returns (Image[]) {
     return address_to_images[_address];
   }
