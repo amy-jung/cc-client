@@ -5,7 +5,8 @@ import {
   IMAGE_PUBLIC_STATUS,
   FUZZY_SEARCH,
   SET_ACTIVE_IMAGE,
-  UPLOAD_CONTRACT
+  UPLOAD_CONTRACT,
+  GET_WEB3_INSTANCE
 } from './types'
 
 // GALLERY
@@ -63,5 +64,12 @@ export const uploadContract = file => {
   return {
     type: UPLOAD_CONTRACT,
     payload: file
+  }
+}
+
+export const getWeb3Instance = instance => {
+  return {
+    type: GET_WEB3_INSTANCE,
+    payload: instance
   }
 }

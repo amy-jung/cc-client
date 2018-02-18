@@ -1,8 +1,23 @@
 /********************************************
+****************** ~FONTS~ ******************
+********************************************/
+
+
+
+/********************************************
 ***************** ~GLOBALS~ *****************
 ********************************************/
+* {
+  --color-red: #E55C3E;
+  --color-blue: #B4D8D0;
+  --color-yellow: #E8C555;
+  --color-green: #6FCF97;
+  --color-grey: #EBEBEB;
+}
+
 body {
   font-family: Helvetica, sans-serif;
+  font-size: .85em;  
 }
 ul {
   list-style: none;
@@ -16,22 +31,125 @@ a {
 ******************* ~MAIN~ ******************
 ********************************************/
 
+.App {
+  display: grid;
+  grid-template-columns: 1fr 2.5fr;
+}
+
+.App .sidenav-wrapper {
+  grid-column: 1/2;
+}
+.App .main-wrapper {
+  grid-column: 2/3;
+}
+
 .header {
+  grid-column: 1/3;
   width: 100%;
+  height: 80px;
   display: flex;
+  flex-grow: 0;
   justify-content: space-between;
-  background: black;
-  color: white;
+  align-items: center;
+  background: var(--color-yellow);
+  /* color: white; */
+  padding: 0 2vw;
+  box-sizing: border-box;
+
+}
+
+.header .logo {
+  border-radius: 5px;
+  width: 43px;
+  height: 43px;
+  background-color: var(--color-grey);
+}
+
+.image-searchbar {
+  border-radius: 5px;
+  overflow:hidden;
+  display: flex;
+  border: none;
+  color: black;
+  width: 50vw;
+  background-color: var(--color-grey); 
+  padding: .25em; 
+}
+
+.image-searchbar input {
+  background-color: var(--color-grey);
+  padding: .25em;
+  border: none;
+  width: 50vw;
 }
 
 .navbar .menu {
   display: flex;
 }
 
+.login-btn {
+  background-color: var(--color-red);
+  color: white;
+  width: 100px;
+  height: 30px;
+  /* padding:  */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.side-nav {
+  margin-top: 90px;
+  /* margin-right: 5em; */
+}
+
+.side-nav ul {
+  padding-left: 3em;
+}
+
+.side-nav ul > li {
+  line-height: 2em;
+}
+
+.side-nav .top-lvl {
+  line-height: 3em;
+}
+
+.side-nav .top-lvl span {
+  display: flex;
+  align-items: center;
+}
+.side-nav .top-lvl span i {
+  margin-right: .5em;
+}
+
+.side-nav .sub-lvl {
+  color: darkgrey;
+}
+
+.side-nav .material-icons {
+  /* padding-bottom: -.25em; */
+}
+
+.side-nav .inbox .unread, .side-nav li .active {
+  color: var(--color-red);
+}
+
 
 /********************************************
 ***************** ~GALLERY~ *****************
 ********************************************/
+
+.gallery .top-wrapper {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.75em 1em;
+}
+.top-wrapper .copy {
+  width: 75%;
+  font-size: .85em;
+}
 
 .image-grid {
   display: flex;
@@ -42,18 +160,71 @@ a {
 }
 
 .image-grid .image {
-  width: 33vw;
-  height: 33vw;
-  margin: .125vw 0;
+  width: 20vw;
+  height: 20vw;
+  margin: 2vw 0;
   object-fit: contain;
   display: flex;
   position: relative;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
 .image img {
   width: 100%;
   height: 100%;
 }
+
+.image .info-tag-wrapper {
+  position: absolute;
+  z-index: 5;
+  width: 100%;
+  height: 20%;
+  bottom: 0;
+  background-color: var(--color-red);
+}
+
+.img-info-tag {
+  padding: .5em 1em;
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 0;
+  font-size: .8em;  
+}
+
+.img-info-tag .hash {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 60%;
+}
+
+.img-info-tag .status {
+  background-color: var(--color-grey);
+  border-radius: 100px;
+  padding: .25em;
+  /* width: 20%; */
+}
+
+.upload-btn button {
+  background-color: var(--color-yellow);
+  border-radius: 5px;
+  width: 100px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-btn i {
+  margin-left: .5em;
+  /* font-size: .5em; */
+}
+
+
+
 
 /********************************************
 ************** ~IMAGE DETAIL~ ***************
@@ -71,6 +242,7 @@ a {
   overflow: scroll;
   border: 1px solid black;
   background: white;
+  z-index: 500;
 }
 
 .image-detail-modal .wrapper {
