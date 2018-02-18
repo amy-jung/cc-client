@@ -1,5 +1,7 @@
 # CC
 
+![cc logo](https://imgur.com/a/F9Yde)
+
 Our application for the EthDenver hackathon is called CC, which is a reference to CreativeCommons licensing and carbon copying (cc-ing) someone on an email.
 
 The idea is allow creators to upload their content to IPFS and simultaneously claim their ownership of it.
