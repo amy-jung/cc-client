@@ -4,7 +4,8 @@ import {
   USER_LOGGED_IN,
   IMAGE_PUBLIC_STATUS,
   FUZZY_SEARCH,
-  SET_ACTIVE_IMAGE
+  SET_ACTIVE_IMAGE,
+  UPLOAD_CONTRACT
 } from './types'
 
 // GALLERY
@@ -39,7 +40,7 @@ export const uploadImage = file => async dispatch => {
   })
 }
 
-export const imagePublicStatus = (status) => {
+export const imagePublicStatus = status => async dispatch => {
   return {
     type: IMAGE_PUBLIC_STATUS,
     payload: status
@@ -48,10 +49,19 @@ export const imagePublicStatus = (status) => {
 
 // AUTH
 
-export const userLoggedIn = (user) => {
+export const userLoggedIn = user => {
+  console.log('fire');
   return {
     type: USER_LOGGED_IN,
     payload: user
   }
 }
 
+// SOLIDITY
+
+export const uploadContract = file => {
+  return {
+    type: UPLOAD_CONTRACT,
+    payload: file
+  }
+}

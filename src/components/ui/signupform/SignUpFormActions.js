@@ -1,11 +1,11 @@
 import AuthenticationContract from '../../../../build/contracts/Authentication.json'
 import { loginUser } from '../loginbutton/LoginButtonActions'
-import store from '../../../utils/redux/Store'
+import Store from '../../../utils/redux/Store'
 
 const contract = require('truffle-contract')
 
 export function signUpUser(name) {
-  let web3 = store.getState().web3.web3Instance
+  let web3 = Store.getState().web3.web3Instance
 
   // Double-check web3's status.
   if (typeof web3 !== 'undefined') {
@@ -31,11 +31,13 @@ export function signUpUser(name) {
           // Attempt to sign up user.
           authenticationInstance.signup(name, {from: coinbase})
           .then(function(result) {
+            console.log(result);
             // If no error, login user.
             return dispatch(loginUser())
           })
           .catch(function(result) {
             // If error...
+            console.log(result);
           })
         })
       })

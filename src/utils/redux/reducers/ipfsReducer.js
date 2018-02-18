@@ -1,5 +1,6 @@
 import buffer from 'buffer'
-import UPLOAD_IMAGE from '../actions/types'
+import ipfsAPI from 'ipfs-api'
+import { UPLOAD_IMAGE } from '../actions/types'
 
 const initialState = {
   imageURL: ''
@@ -8,11 +9,13 @@ const initialState = {
 export default function ipfsReducer(state = initialState, action) {
   switch (action.type) {
     case UPLOAD_IMAGE : {
+      console.log('upload img');
       const newState = { ...state }
       const reader = new FileReader();
       reader.onloadend = function() {
-        const ipfs = window.IpfsApi('localhost', 5001)
+        const ipfs = ipfsAPI('localhost', 5001)
         const buf = buffer.Buffer(reader.result)
+        console.log(ipfs);
         ipfs.files.add(buf, (err, result) => {
           if(err) {
             console.error(err)
@@ -20,13 +23,13 @@ export default function ipfsReducer(state = initialState, action) {
           }
           let url = `https://ipfs.io/ipfs/${result[0].hash}`
           console.log(`Url --> ${url}`)
-          newState.imageURL = action.payload
+          newState.imageURL = url
           return newState
         })
         reader.readAsArrayBuffer(action.payload)
       }
       const photo = document.getElementById("photo");
-      reader.readAsArrayBuffer(photo.files[0])
+      reader.readAsArrayBuffer(action.payload)
       return newState
     }
     default : 

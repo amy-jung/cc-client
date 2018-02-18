@@ -1,3 +1,5 @@
+import { UPLOAD_CONTRACT } from '../actions/types'
+
 const initialState = {
   web3Instance: null
 }
@@ -9,7 +11,6 @@ const web3Reducer = (state = initialState, action) => {
       web3Instance: action.payload.web3Instance
     })
   }
-
   return state
 }
 

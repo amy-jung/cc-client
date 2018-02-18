@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { uploadImage } from '../../utils/redux/actions/'
+import { uploadImage } from '../../utils/redux/actions'
 import { binder } from '../../utils/'
 
 class Upload extends Component {
@@ -13,7 +13,7 @@ class Upload extends Component {
     binder(this, ['handleSubmitForm', 'handleTagInputChange', 'handleAddTag', 'renderTags'])
   }
 
-  handleTagInputchange (e) {
+  handleTagInputChange (e) {
     this.setState({
       tagName: e.target.value
     })
@@ -21,8 +21,9 @@ class Upload extends Component {
 
   handleAddTag () {
     if (this.state.tagList.length < 5) {
-        this.setState({
-        tagList: this.state.tagList.push(this.state.tagName)
+      const newTagList = this.state.tagList.push(this.state.tagName)
+      this.setState({
+        tagList: newTagList
       })
     } else {
       alert('you have already selected five tags')
@@ -30,6 +31,7 @@ class Upload extends Component {
     this.setState({
       tagName: ''
     })
+    console.log(this.state.tagList);
     
   }
 
@@ -37,7 +39,10 @@ class Upload extends Component {
   handleSubmitForm (e) {
     e.preventDefault()
     const { files } = this.imgInput
-    files.length > 0 && this.props.onUploadImage(files[0])
+    if (files.length > 0) {
+      console.log(files);
+      this.props.onUploadImage(files[0])
+    }
   }
 
   renderTags () {
@@ -62,13 +67,19 @@ class Upload extends Component {
           </fieldset>
           <button type='submit'>Upload</button>
         </form>
+        <div>
+          <span>{ this.props.imageURL }</span>
+          <img src={this.props.imageURL} />
+        </div>
       </div>
     );
   }
 }
 
 function mapStateToProps(state) {
-  return {}
+  return {
+    imageURL: state.ipfs.imageURL
+  }
 }
 
 function mapDispatchToProps(dispatch) {
