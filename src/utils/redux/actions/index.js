@@ -4,7 +4,8 @@ import {
   USER_LOGGED_IN,
   IMAGE_PUBLIC_STATUS,
   FUZZY_SEARCH,
-  SET_ACTIVE_IMAGE
+  SET_ACTIVE_IMAGE,
+  UPLOAD_CONTRACT
 } from './types'
 
 // GALLERY
@@ -53,5 +54,14 @@ export const userLoggedIn = user => {
   return {
     type: USER_LOGGED_IN,
     payload: user
+  }
+}
+
+// SOLIDITY
+
+export const uploadContract = file => {
+  return {
+    type: UPLOAD_CONTRACT,
+    payload: file
   }
 }
