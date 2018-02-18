@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router'
 import MaterialIcon from 'material-icons-react'
 
 class SideNav extends Component {
@@ -12,8 +13,13 @@ class SideNav extends Component {
       <div className="side-nav">
         <div className="side-nav-items">
           <ul>
-          
-            <li className='top-lvl inbox'><span><MaterialIcon icon='message'/>Inbox <span className='unread'>&nbsp;(5 unread)</span></span></li>
+            <li className='top-lvl inbox'>
+            <span>
+              <Link to='/inbox'>
+              <MaterialIcon icon='message' />Inbox <span className='unread'>&nbsp;(5 unread)</span>
+              </Link>
+            </span>
+            </li>
             <li className='top-lvl has-children'>
               <span><MaterialIcon icon='photo_library'/>MyImages</span>
               <ul>
