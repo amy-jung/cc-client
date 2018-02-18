@@ -1,70 +1,124 @@
-# React, Redux and Authentication Truffle Box
+# CC
 
-In addition to Webpack and React, this box adds: react-router, redux and redux-auth-wrapper for authentication powered by a smart contract. Great for building your own auth system.
+Our application for the EthDenver hackathon is called CC, which is a reference to CreativeCommons licensing and carbon copying (cc-ing) someone on an email.
 
-## Installation
+The idea is allow creators to upload their content to IPFS and simultaneously claim their ownership of it.
 
-1. Install Truffle globally.
-    ```javascript
-    npm install -g truffle
-    ```
+Patrons of their art can also ask for permission to use the work by submitting a request with their proposed uses.
 
-2. Download the box. This also takes care of installing the necessary dependencies.
-    ```javascript
-    truffle unbox react-auth
-    ```
+The creator can then allow or deny each user based on their proposal.
 
-3. Run the development console.
-    ```javascript
-    truffle develop
-    ```
+# Getting Started
 
-4. Compile and migrate the smart contracts. Note inside the development console we don't preface commands with `truffle`.
-    ```javascript
-    compile
-    migrate
-    ```
+To run this project, run the following commands after cloning this repo.
 
-5. Run the webpack server for front-end hot reloading (outside the development console). Smart contract changes must be manually recompiled and migrated.
-    ```javascript
-    // Serves the front-end on http://localhost:3000
-    npm run start
-    ```
+```bash
+$ npm install
+$ truffle develop
 
-6. Truffle can run tests written in Solidity or JavaScript against your smart contracts. Note the command varies slightly if you're in or outside of the development console.
-    ```javascript
-    // If inside the development console.
-    test
+truffle-develop > compile
+truffle-develop > migrate
+```
 
-    // If outside the development console..
-    truffle test
-    ```
+To run the front end, `$ npm run start` which will open `localhost:3000` for you.
 
-7. Jest is included for testing React components. Compile your contracts before running Jest, or you may receive some file not found errors.
-    ```javascript
-    // Run Jest outside of the development console for front-end component tests.
-    npm run test
-    ```
+# Interacting with the Smart Contract
 
-8. To build the application for production, use the build command. A production build will be in the build_webpack folder.
-    ```javascript
-    npm run build
-    ```
+### get img contract instance and accounts
 
-## FAQ
+```solidity
+Images.deployed().then(function(instance) { img = instance; })
+account1 = web3.eth.accounts[0]
+account2 = web3.eth.accounts[1]
+```
 
-* __How do I use this with the EthereumJS TestRPC?__
+### Create a new image reference
 
-    It's as easy as modifying the config file! [Check out our documentation on adding network configurations](http://truffleframework.com/docs/advanced/configuration#networks). Depending on the port you're using, you'll also need to update line 34 of `src/util/web3/getWeb3.js`.
+The arguments are the ipfs hash, whether the image is public or not and one tag to describe the image. In this case "charts".
 
-* __Why is there both a truffle.js file and a truffle-config.js file?__
+```solidity
+img.createNewImage("QmZEeLvqfDJnihzoLWdgfQxDu9U3emLPbxbcG8HyyWxC8S", true, "charts", { from: account1 })
+```
 
-    `truffle-config.js` is a copy of `truffle.js` for compatibility with Windows development environments. Feel free to it if it's irrelevant to your platform.
+### See all Image Hashes
 
-* __Where is my production build?__
+```solidity
+img.allImages.call();
+img.numberOfImages.call();
+```
 
-    The production build will be in the build_webpack folder. This is because Truffle outputs contract compilations to the build folder.
 
-* __Where can I find more documentation?__
+### See all images for a creator and their request count
 
-    This box is a marriage of [Truffle](http://truffleframework.com/) and a React setup created with [create-react-app](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md). Either one would be a great place to start!
+```solidity
+img.publicImagesForCreator.call(account2, { from: account2 })
+img.imageRequestCount.call("test", { from: account1} )
+
+img.createNewImage("test3", false, "cats", { from: account2 })
+img.privateImagesForCreator.call(account2, { from: account2 })
+```
+
+### See all the images a patron has permission to use
+
+```solidity
+img.allowedImagesForPatron.call(account2, { from: account2 })
+```
+
+### Edit Image's Private/Public Status
+If a user decides they want to turn a private image public, they can update their own image.
+
+```solidity
+// if I said this initially
+img.createNewImage("test3", false, "cats", { from: account2 })
+
+// it will not show up in public images with
+img.publicImagesForCreator.call(account2, { from: account2 })
+
+// but I can edit my own images, identified by their hash
+img.editImageIsPublic("test3", true, { from: account2 })
+
+// and it will now show up in all images.
+img.allImages.call();
+```
+
+There is no support for moving an image from public to private, since it is being uploaded to IPFS.
+
+### Image Tags
+
+Find all image hashes for a given tag with
+
+```solidity
+img.imagesForTag.call("cats")
+```
+
+# Permissions
+
+Get an instance of our deployed Permission contract in truffle develop console.
+
+```solidity
+Permission.deployed().then(function(instance) { per = instance; })
+```
+
+A Patron can request to use an image, which notifies the Creator.
+
+```solidity
+per.requestImageUse("test", "hey I would like to use this image plz", { from: account2 })
+
+// check on the permission status
+per.getPermissionStatus.call(account2, "test", { from: account2 })
+```
+
+The owner of the image can give permission (true/false) based on what they think of the request.
+
+```solidity
+per.imageRequestDecision("test", true, account2, { from: account1 })
+```
+
+This will add the Patron's address to the allowed images.
+
+```solidity
+per.allowedImagesForPatron.call(account2, { from: account2 })
+```
+
+
+* [ ] image info (by hash) for owner, number of requests, etc
