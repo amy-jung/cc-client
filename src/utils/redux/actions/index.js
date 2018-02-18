@@ -35,10 +35,10 @@ export const setActiveImage = image => async dispatch => {
 
 // FILE TRANSFER
 
-export const uploadImage = file => async dispatch => {
+export const uploadImage = (file, callback) => async dispatch => {
   dispatch({
     type: UPLOAD_IMAGE,
-    payload: file
+    payload: { file, callback }
   })
 }
 
