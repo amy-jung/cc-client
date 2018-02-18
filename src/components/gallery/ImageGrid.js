@@ -3,7 +3,7 @@ import Image from './Image'
 
 export default ({ images, openImageModal }) => {
   const imageGrid = images.map((image, i) => (
-    <div key={i}><div onClick={() => openImageModal(image)}><Image imageSRC={image} /></div></div>
+    <div key={i}><div onClick={() => openImageModal(image)}><Image gallery imageObj={image} /></div></div>
   ))
   return (
     <div>

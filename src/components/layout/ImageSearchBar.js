@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+// import FuzzySearch from 'react-fuzzy-search'
+import MaterialIcon from 'material-icons-react'
 import { fuzzySearch } from '../../utils/redux/actions'
 
 class ImageSearchBar extends Component {
@@ -19,10 +21,13 @@ class ImageSearchBar extends Component {
 
   render() {
     return (
-      <div>
+      <div className='image-searchbar'>
+        {/* <FuzzySearch /> */}
+        {/* <i className='mdi mdi-magnify'></i> */}
+        <MaterialIcon icon='search' />
         <input onChange={this.handleChange} id='image-searchbar' type='text' placeholder='Search Images' value={this.state.search} />
       </div>
-    );
+    )
   }
 }
 
