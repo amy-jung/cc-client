@@ -1,7 +1,6 @@
 pragma solidity ^0.4.18;
 
 import './zeppelin/lifecycle/Killable.sol';
-/* import './zeppelin/ownership/RBAC.sol'; */
 
 contract Authentication is Killable {
   struct User {

@@ -30,10 +30,7 @@ contract Images is RBAC, Authentication {
   }
 
   // EVENTS WHICH WE MUST LISTEN FOR //
-  event ImageRequested(address imageOwner, bytes32 ipfsHash);
   event ImageUploaded(address imageOwner, bytes32 ipfsHash);
-  event ImageApproved(address imageRequester, bytes32 ipfsHash);
-  event ImageDenied(address imageRequester, bytes32 ipfsHash);
 
   // IMAGE INFORMATION STORAGE LAYER //
   struct Image {
@@ -49,6 +46,11 @@ contract Images is RBAC, Authentication {
   // DATA WE MUST ACCESS //
   // 1. addresses of all public images
   bytes32[] public publicImages;
+
+  function allImages() returns (bytes32[]) {
+    return publicImages;
+  }
+
   // 2. all images for a CREATOR
   mapping (address => bytes32[]) public creatorsPublicImages;
 
@@ -73,7 +75,8 @@ contract Images is RBAC, Authentication {
   // INTERNAL ACCESS POINTS //
   mapping (address => Image[]) private creatorAddressToImages;
   // access the image by its ipfs hash
-  mapping (bytes32 => Image) private hashToImage;
+  mapping (bytes32 => Image) public hashToImage;
+
 
   function numberOfImages() returns (uint) {
     return publicImages.length;
@@ -95,6 +98,7 @@ contract Images is RBAC, Authentication {
 
     creatorAddressToImages[msg.sender].push(Image(true, msg.sender, _ipfsHash, _isPublic, emptyArray, _tag, 0));
     hashToImage[_ipfsHash] = Image(true, msg.sender, _ipfsHash, _isPublic, emptyArray, _tag, 0);
+    tagToImages[_tag].push(_ipfsHash);
     ImageUploaded(msg.sender, _ipfsHash);
     addRole(msg.sender, ROLE_CREATOR);
 
@@ -115,24 +119,6 @@ contract Images is RBAC, Authentication {
     hashToImage[_ipfsHash].isPublic = isPublic;
   }
 
-  // A Patron will request to use a certain image, triggering event for Creator
-  function requestImageUse(bytes32 _ipfsHash) {
-    addRole(msg.sender, ROLE_PATRON);
-    ImageRequested(hashToImage[_ipfsHash].owner, _ipfsHash);
-  }
-
-  function imageRequestDecision(bytes32 _ipfsHash, bool decision, address requester) onlyCreator returns (bool) {
-    require (hashToImage[_ipfsHash].owner == msg.sender );
-
-    if (decision) {
-      patronPermittedImages[requester].push(_ipfsHash);
-      hashToImage[_ipfsHash].allowedUsers.push(requester);
-      ImageApproved(requester, _ipfsHash);
-      return true;
-    } else {
-      ImageDenied(requester, _ipfsHash);
-    }
-  }
 
 
   // This can't be done at all I think
