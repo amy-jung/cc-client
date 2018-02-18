@@ -1,8 +1,12 @@
 import React from 'react'
 import ImageInfoTag from './ImageInfoTag'
 
-export default ({ imageObj : { srcHash, userHash, transactions, isPublic }, gallery }) => {
+// imageObj : { srcHash = '', userHash, transactions, isPublic }
+
+export default ({ imageObj = {}, gallery }) => {
   // const fullURL = 'localhost:whatever' + imgHash
+  // console.log(srcHash);
+  const { srcHash, userHash, transactions, isPublic } = imageObj
   return (
     <div className='image'>
       <img src={srcHash} />

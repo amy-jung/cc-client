@@ -12,7 +12,6 @@ class componentName extends Component {
   }
 
   renderTransactions () {
-    console.log(this.props.transactions)    
     return this.props.transactions.map((trans, i) => {
       return(
         <tr key={i}>
