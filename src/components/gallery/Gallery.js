@@ -15,7 +15,7 @@ class Gallery extends Component {
     super(props)
     this.state = {
       imageDetailOpen: false,
-      uploadModalOpen: true,
+      uploadModalOpen: false,
       ipfsURL: '',
       dummyArray: []
     }
@@ -112,6 +112,7 @@ class Gallery extends Component {
   }
 
   handleUploadSubmit (e, ref) {
+    this.setState({ uploadModalOpen: false })
     e.preventDefault()
     const { files } = ref
     if (files.length > 0) {
@@ -138,7 +139,7 @@ class Gallery extends Component {
         {/* <ImageSearchBar /> */}
         <div className="top-wrapper">
           <div className='copy'>Creative Credit is embedded into each image via the blockchain. No code required. Just download and share!</div>
-          <UploadBtn handleUploadClick={this.handleUploadClick} isLoggedIn={this.props.isLoggedIn}/>
+          <UploadBtn handleUploadClick={() => { this.setState({uploadModalOpen: true}) }} isLoggedIn={true}/>
         </div>
         <ImageGrid openImageModal={this.openImageModal} searchFilter={this.props.searchFilter} images={this.state.dummyArray} />
         { this.state.imageDetailOpen && <ImageDetail activeImage={this.props.activeImage} close={this.closeImageModal} /> }
