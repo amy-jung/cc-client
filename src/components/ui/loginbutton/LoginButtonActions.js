@@ -1,7 +1,7 @@
 import AuthenticationContract from '../../../../build/contracts/Authentication.json'
 import { browserHistory } from 'react-router'
 
-import { userLoggedIn } from '../../../utils/redux/actions'
+import { userLoggedIn } from '../../../utils/redux/actions/'
 import Store from '../../../utils/redux/Store'
 
 const contract = require('truffle-contract')
@@ -30,12 +30,16 @@ export function loginUser() {
 
         authentication.deployed().then(function(instance) {
           authenticationInstance = instance
+          console.log('one');
 
           // Attempt to login user.
           authenticationInstance.login({from: coinbase})
           .then(function(result) {
+            console.log('two');
             // If no error, login user.
             var userName = web3.toUtf8(result)
+
+            console.log(userName);
 
             dispatch(userLoggedIn({"name": userName}))
 
@@ -52,6 +56,7 @@ export function loginUser() {
           })
           .catch(function(result) {
             // If error, go to signup page.
+            console.log("error ", result);
             console.error('Wallet ' + coinbase + ' does not have an account!')
 
             return browserHistory.push('/login')

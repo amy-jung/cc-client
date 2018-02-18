@@ -8,9 +8,6 @@ export default () => {
   const OnlyAuthLinks = VisibleOnlyAuth(() =>
     <span>
       <li className="pure-menu-item">
-        <Link to="/dashboard" className="pure-menu-link">Dashboard</Link>
-      </li>
-      <li className="pure-menu-item">
         <Link to="/profile" className="pure-menu-link">Profile</Link>
       </li>
       <LogoutButtonContainer />
@@ -26,7 +23,7 @@ export default () => {
     )
   return (
     <div className='header'>
-      <div className='logo'><h1>CC</h1></div>
+      <div className='logo'><h1><Link to="/">CC</Link></h1></div>
       <nav className="navbar">
           <ul className="menu">
             <OnlyGuestLinks />

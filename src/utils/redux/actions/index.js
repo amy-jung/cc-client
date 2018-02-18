@@ -39,7 +39,7 @@ export const uploadImage = file => async dispatch => {
   })
 }
 
-export const imagePublicStatus = (status) => {
+export const imagePublicStatus = status => async dispatch => {
   return {
     type: IMAGE_PUBLIC_STATUS,
     payload: status
@@ -48,10 +48,10 @@ export const imagePublicStatus = (status) => {
 
 // AUTH
 
-export const userLoggedIn = (user) => {
+export const userLoggedIn = user => {
+  console.log('fire');
   return {
     type: USER_LOGGED_IN,
     payload: user
   }
 }
-

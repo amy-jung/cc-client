@@ -30,10 +30,14 @@ ReactDOM.render((
       <Router history={history}>
         <Route path="/" component={App}>
           <IndexRoute component={Home} />
-          <Route path="profile" component={UserIsAuthenticated(Profile)} />
-          <Route path="inbox" component={UserIsAuthenticated(Inbox)} />
-          <Route path="upload" component={UserIsAuthenticated(Upload)} />
+          <Route path="profile" component={UserIsNotAuthenticated(Profile)} />
+          <Route path="inbox" component={UserIsNotAuthenticated(Inbox)} />
+          <Route path="upload" component={UserIsNotAuthenticated(Upload)} />
           <Route path="login" component={UserIsNotAuthenticated(Login)} />
+          {/* <Route path="profile" component={Profile} />
+          <Route path="inbox" component={Inbox} />
+          <Route path="upload" component={Upload} />
+          <Route path="login" component={Login} /> */}
           {/* <Route path="login" component={UserIsNotAuthenticated(Login)} /> */}
         </Route>
       </Router>
