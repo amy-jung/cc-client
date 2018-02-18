@@ -1,36 +1,14 @@
 pragma solidity ^0.4.18;
 
-import './zeppelin/ownership/RBAC.sol';
-import './Authentication.sol';
+/* import './zeppelin/ownership/RBAC.sol';
+import './Authentication.sol'; */
 
-contract Images is RBAC, Authentication {
-
-  // ROLE BASED ACCESS CONTROL ///
-
-  // there are two roles within our Dapp, plus admin in the Zeppelin contract
-  string public constant ROLE_CREATOR = "creator"; // someone who owns an image
-  string public constant ROLE_PATRON = "patron"; // someone who wants to use an image
-
-  // meaning only folks with accounts created can call functions
-  modifier onlyCreatorOrPatron() {
-    require(
-      hasRole(msg.sender, ROLE_CREATOR) || hasRole(msg.sender, ROLE_PATRON)
-    );
-    _;
-  }
-
-  modifier onlyCreator() {
-    require(hasRole(msg.sender, ROLE_CREATOR));
-    _;
-  }
-
-  modifier onlyPatron() {
-    require(hasRole(msg.sender, ROLE_PATRON));
-    _;
-  }
+contract Images {
 
   // EVENTS WHICH WE MUST LISTEN FOR //
   event ImageUploaded(address imageOwner, bytes32 ipfsHash);
+
+  // TODO modifier onlyImageOwner(hash)
 
   // IMAGE INFORMATION STORAGE LAYER //
   struct Image {
@@ -53,10 +31,17 @@ contract Images is RBAC, Authentication {
 
   // 2. all images for a CREATOR
   mapping (address => bytes32[]) public creatorsPublicImages;
+  mapping (address => bytes32[]) private creatorsPrivateImages;
 
-  function imagesForCreator(address _addr) returns (bytes32[]) {
+  function publicImagesForCreator(address _addr) public returns (bytes32[]) {
     return creatorsPublicImages[_addr];
   }
+
+  function privateImagesForCreator(address _addr) returns (bytes32[]) {
+    require( msg.sender == _addr );
+    return creatorsPrivateImages[_addr];
+  }
+
 
   // 3. all images a PATRON can use
   mapping (address => bytes32[]) public patronPermittedImages;
@@ -72,6 +57,11 @@ contract Images is RBAC, Authentication {
     return tagToImages[tag];
   }
 
+  // 5. Count of Permissions
+  function imageRequestCount(bytes32 _ipfsHash) returns (uint) {
+    return hashToImage[_ipfsHash].numberOfRequests;
+  }
+
   // INTERNAL ACCESS POINTS //
   mapping (address => Image[]) private creatorAddressToImages;
   // access the image by its ipfs hash
@@ -82,11 +72,11 @@ contract Images is RBAC, Authentication {
     return publicImages.length;
   }
 
+  string public hello;
+
   // constructor function with all the needed roles
   function Images() {
-    addRole(msg.sender, ROLE_CREATOR);
-    addRole(msg.sender, ROLE_PATRON);
-    addRole(msg.sender, ROLE_ADMIN);
+    hello = "hello. this contract works.";
   }
 
   function createNewImage(bytes32 _ipfsHash, bool _isPublic, bytes32 _tag) returns (bool) {
@@ -100,30 +90,29 @@ contract Images is RBAC, Authentication {
     hashToImage[_ipfsHash] = Image(true, msg.sender, _ipfsHash, _isPublic, emptyArray, _tag, 0);
     tagToImages[_tag].push(_ipfsHash);
     ImageUploaded(msg.sender, _ipfsHash);
-    addRole(msg.sender, ROLE_CREATOR);
 
     // only if image is public, add it to public images
     if (_isPublic) {
       publicImages.push(_ipfsHash);
       creatorsPublicImages[msg.sender].push(_ipfsHash);
       return true;
+    } else {
+      creatorsPrivateImages[msg.sender].push(_ipfsHash);
+      return true;
     }
-
-    // TODO case check for when image cannot be created?
     return true;
   }
 
   // allow the CREATOR to change whether an image is public
-  function editImage(bytes32 _ipfsHash, bool isPublic) onlyCreator returns (bool) {
+  function editImageIsPublic(bytes32 _ipfsHash, bool isPublic) returns (bool) {
     require (hashToImage[_ipfsHash].owner == msg.sender );
-    hashToImage[_ipfsHash].isPublic = isPublic;
+    Image storage thatImage = hashToImage[_ipfsHash];
+
+    // case where it was private and is now public
+    if (isPublic) {
+      publicImages.push(_ipfsHash);
+      creatorsPublicImages[msg.sender].push(_ipfsHash);
+      return isPublic;
+    }
   }
-
-
-
-  // This can't be done at all I think
-  /* function imagesForAddress(address _address) public returns (bytes32[]) {
-    return creatorAddressToImages[_address].ipfsHash;
-  } */
-
 }

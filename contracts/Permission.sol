@@ -1,10 +1,10 @@
 pragma solidity ^0.4.18;
 
-import './zeppelin/ownership/RBAC.sol';
-import './Authentication.sol';
+/* import './zeppelin/ownership/RBAC.sol';
+import './Authentication.sol'; */
 import './Images.sol';
 
-contract Permission is RBAC, Authentication, Images {
+contract Permission is Images {
 
   event ImageRequested(address imageOwner, bytes32 ipfsHash);
   event ImageApproved(address imageRequester, bytes32 ipfsHash);
@@ -14,56 +14,50 @@ contract Permission is RBAC, Authentication, Images {
 
   struct PermissionStatus {
     address requester;
-    Image image;
+    bytes32 imageHash;
     bool status;
+  }
+
+  function numberOfPermissions(address _addr) returns (uint) {
+    return permissionStatuses[_addr].length;
   }
 
   function getPermissionStatus(address requester, bytes32 _ipfsHash) returns (bool) {
     uint i = 0;
-    Image storage getImage = hashToImage[_ipfsHash];
     for (i; i<permissionStatuses[requester].length; i++) {
-      Image tempImage = permissionStatuses[requester][i].image;
-      if (tempImage.ipfsHash == getImage.ipfsHash) {
+      bytes32 hsh = permissionStatuses[requester][i].imageHash;
+      if (hsh == _ipfsHash) {
         return permissionStatuses[requester][i].status;
       }
     return false;
     }
   }
 
-  function getPermissionStatusObject(address requester, bytes32 _ipfsHash) returns (PermissionStatus) {
-    uint i = 0;
-    Image storage getImage = hashToImage[_ipfsHash];
-    for (i; i<permissionStatuses[requester].length; i++) {
-      Image tempImage = permissionStatuses[requester][i].image;
-      if (tempImage.ipfsHash == getImage.ipfsHash) {
-        return permissionStatuses[requester][i];
-      }
-    }
-  }
-
   // A Patron will request to use a certain image, triggering event for Creator
   function requestImageUse(bytes32 _ipfsHash) {
-    addRole(msg.sender, ROLE_PATRON);
-
-    Image requestedImage = hashToImage[_ipfsHash];
-    permissionStatuses[msg.sender].push(PermissionStatus(msg.sender, requestedImage, false));
+    permissionStatuses[msg.sender].push(PermissionStatus(msg.sender, _ipfsHash, false));
     ImageRequested(hashToImage[_ipfsHash].owner, _ipfsHash);
   }
 
-  function imageRequestDecision(bytes32 _ipfsHash, bool decision, address requester) onlyCreator returns (bool) {
-    require (hashToImage[_ipfsHash].owner == msg.sender );
+  function imageRequestDecision(bytes32 _ipfsHash, bool _decision, address _requester) returns (bool) {
+    /* require (hashToImage[_ipfsHash].owner == msg.sender); */
 
-    if (decision) {
-      PermissionStatus memory tempStatus = getPermissionStatusObject(requester, _ipfsHash);
-        
-      tempStatus.status = true;
-      patronPermittedImages[requester].push(_ipfsHash);
-      hashToImage[_ipfsHash].allowedUsers.push(requester);
-      ImageApproved(requester, _ipfsHash);
+    if (_decision == true) {
+      // actually write decision change
+      for (uint i = 0; i < permissionStatuses[_requester].length; i++) {
+        if (permissionStatuses[_requester][i].imageHash == _ipfsHash) {
+          permissionStatuses[_requester][i].status = _decision;
+        }
+      // update the places to access this information
+      patronPermittedImages[_requester].push(_ipfsHash);
+      hashToImage[_ipfsHash].allowedUsers.push(_requester);
+      hashToImage[_ipfsHash].numberOfRequests = hashToImage[_ipfsHash].numberOfRequests + 1;
+      ImageApproved(_requester, _ipfsHash);
       return true;
+      }
     } else {
-      ImageDenied(requester, _ipfsHash);
+      ImageDenied(_requester, _ipfsHash);
+      return false;
     }
   }
-
 }

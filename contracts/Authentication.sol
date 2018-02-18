@@ -3,6 +3,7 @@ pragma solidity ^0.4.18;
 import './zeppelin/lifecycle/Killable.sol';
 
 contract Authentication is Killable {
+
   struct User {
     bytes32 name;
   }
@@ -25,18 +26,11 @@ contract Authentication is Killable {
     _;
   }
 
-  function login() constant
-  public
-  onlyExistingUser
-  returns (bytes32) {
+  function login() constant public onlyExistingUser returns (bytes32) {
     return (users[msg.sender].name);
   }
 
-  function signup(bytes32 name)
-  public
-  payable
-  onlyValidName(name)
-  returns (bytes32) {
+  function signup(bytes32 name) public payable onlyValidName(name) returns (bytes32) {
     // Check if user exists.
     // If yes, return user name.
     // If no, check if name was sent.
@@ -52,12 +46,7 @@ contract Authentication is Killable {
     return (users[msg.sender].name);
   }
 
-  function update(bytes32 name)
-  public
-  payable
-  onlyValidName(name)
-  onlyExistingUser
-  returns (bytes32) {
+  function update(bytes32 name) public payable onlyValidName(name) onlyExistingUser returns (bytes32) {
     // Update user name.
 
     if (users[msg.sender].name != 0x0)
