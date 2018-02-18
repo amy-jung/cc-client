@@ -2,8 +2,10 @@ import React from 'react'
 
 export default () => {
   return (
-    <div>
-      laneisawesome
+    <div className="inbox">
+    <div className="inbox-header">
+      <strong>Pending</strong>
+    </div>
     </div>
   )
 }
