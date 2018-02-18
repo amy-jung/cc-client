@@ -1,6 +1,6 @@
 # CC
 
-![cc logo](https://imgur.com/a/F9Yde)
+![cc logo](https://i.imgur.com/iQuPlgY.png)
 
 Our application for the EthDenver hackathon is called CC, which is a reference to CreativeCommons licensing and carbon copying (cc-ing) someone on an email.
 
