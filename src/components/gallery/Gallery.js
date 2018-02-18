@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { setGalleryFilter, setActiveImage, getWeb3Instance } from '../../utils/redux/actions/'
+import { setGalleryFilter, setActiveImage, getWeb3Instance, getImageContract } from '../../utils/redux/actions/'
+import getWeb3 from '../../utils/web3/getWeb3'
 import ImageGrid from './ImageGrid'
 // import ImageFilters from './ImageFilters'
 // import ImageSearchBar from './ImageSearchBar'
@@ -16,14 +17,62 @@ class Gallery extends Component {
     this.state = {
       imageDetailOpen: false
     }
-    binder(this, ['generateStockImgArray', 'openImageModal', 'closeImageModal'])
+    binder(this, ['generateStockImgArray', 'openImageModal', 'closeImageModal', 'callImageContract'])
   }
 
   componentDidMount () {
-    if( this.props.web3 ){
-      console.log(this.props.web3.eth.accounts[0])
-      this.props.onGetWeb3Instance(this.props.web3)
+      // 
+    // this.props.onGetWeb3Instance(this.props.web3)    
+    // this.props.getImageContract()
+    if ( this.props.web3 ) {
+      
+      this.props.onGetImageContract() 
+      // console.log(this.props.imageContract)
+      console.log(this.props.web3);                 
+    } else {
+      // this.props.onGetWeb3Instance(this.props.web3)    
+      // this.props.onGetImageContract()   
+    //   console.log('getting web3 now');
+      getWeb3.then(res => {
+        console.log(res.payload.web3Instance);
+        this.props.onGetWeb3Instance(res.payload.web3Instance)        
+        this.props.onGetImageContract()
+      })
     }
+  }
+
+  callImageContract () {
+    // console.log(this.props.imageContract.allImages);
+    // if (this.props.imageContract.allImages) {
+    // const asyncGetEm = async () => {
+    //   const allImages = await this.props.imageContract.allImages.call()
+    //   console.log(allImages);
+    // }
+    // asyncGetEm()
+      // console.log(this.props.imageContract.allImages.call((err,res)=>{ res }));
+
+
+
+      this.props.imageContract.allImages.call((err, res) => {
+        console.log(err)        
+        console.log(res) 
+        // return res
+        // res.forEach(hex => {
+        //   const asciiHex = this.props.web3.toAscii(hex)
+        //   console.log(asciiHex);
+        // })
+      })
+
+
+
+
+    // }
+    //  else {
+    //   console.log('else');
+    //   this.props.onGetImageContract(this.props.web3)      
+    // }
+
+    // this.props.imageContract.hello.call((err, res) => console.log(err, res))
   }
 
   generateStockImgArray () {
@@ -50,6 +99,7 @@ class Gallery extends Component {
   }
 
   openImageModal (img) {
+    this.callImageContract()
     this.setState({ imageDetailOpen: true })
     this.props.onSetActiveImage(img)
   }
@@ -59,6 +109,9 @@ class Gallery extends Component {
   }
 
   render () {
+    // this.callImageContract()
+    
+    // console.log(this.props.web3);
     return <div className='gallery' style={{ overflow: this.state.imageDetailOpen ? 'hidden' : 'scroll' }}>
         {/* <ImageFilters /> */}
         {/* <ImageSearchBar /> */}
@@ -77,7 +130,8 @@ function mapStateToProps (state) {
     filter: state.gallery.filter,
     searchFilter: state.gallery.fuzzySearch,
     activeImage: state.gallery.activeImage,
-    web3: state.web3.web3Instance
+    web3: state.web3.web3Instance,
+    imageContract: state.solidity.imageContract
   }
 }
 
@@ -85,7 +139,8 @@ function mapDispatchToProps (dispatch) {
   return {
     onSetGalleryFilter: filter => dispatch(setGalleryFilter(filter)),
     onSetActiveImage: image => dispatch(setActiveImage(image)),
-    onGetWeb3Instance: instance => dispatch(getWeb3Instance(instance))
+    onGetWeb3Instance: instance => dispatch(getWeb3Instance(instance)),
+    onGetImageContract: () => dispatch(getImageContract())
   }
 }
 
