@@ -49,7 +49,7 @@ account2 = web3.eth.accounts[1]
 
 Permission.deployed().then(function(instance) { per = instance; })
 
-per.requestImageUse("test", { from: account2 })
+per.requestImageUse("test", "hey I would like to use this image plz", { from: account2 })
 per.numberOfPermissions.call(account2, { from: account2 })
 per.getPermissionStatus.call(account2, "test", { from: account2 })
 

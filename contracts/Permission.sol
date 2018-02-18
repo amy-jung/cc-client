@@ -1,12 +1,10 @@
 pragma solidity ^0.4.18;
 
-/* import './zeppelin/ownership/RBAC.sol';
-import './Authentication.sol'; */
 import './Images.sol';
 
 contract Permission is Images {
 
-  event ImageRequested(address imageOwner, bytes32 ipfsHash);
+  event ImageRequested(address imageOwner, bytes32 ipfsHash, string message);
   event ImageApproved(address imageRequester, bytes32 ipfsHash);
   event ImageDenied(address imageRequester, bytes32 ipfsHash);
 
@@ -15,6 +13,7 @@ contract Permission is Images {
   struct PermissionStatus {
     address requester;
     bytes32 imageHash;
+    string message;
     bool status;
   }
 
@@ -34,9 +33,9 @@ contract Permission is Images {
   }
 
   // A Patron will request to use a certain image, triggering event for Creator
-  function requestImageUse(bytes32 _ipfsHash) {
-    permissionStatuses[msg.sender].push(PermissionStatus(msg.sender, _ipfsHash, false));
-    ImageRequested(hashToImage[_ipfsHash].owner, _ipfsHash);
+  function requestImageUse(bytes32 _ipfsHash, string _message) {
+    permissionStatuses[msg.sender].push(PermissionStatus(msg.sender, _ipfsHash, _message, false));
+    ImageRequested(hashToImage[_ipfsHash].owner, _ipfsHash, _message);
   }
 
   function imageRequestDecision(bytes32 _ipfsHash, bool _decision, address _requester) returns (bool) {
