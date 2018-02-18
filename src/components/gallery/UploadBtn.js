@@ -2,11 +2,11 @@ import React from 'react'
 import { Link } from 'react-router'
 import MaterialIcon from 'material-icons-react'
 
-export default ({ isLoggedIn = true }) => {
+export default ({ isLoggedIn, handleUploadClick }) => {
   return (
     <div className='upload-btn'>
       { isLoggedIn
-        ? <Link to='/upload'><button >Upload <MaterialIcon icon='add' size={15} /></button></Link>
+        ? <div onClick={handleUploadClick}><button >Upload <MaterialIcon icon='add' size={15} /></button></div>
         : <Link to='/login'><button >Upload <MaterialIcon icon='add' size={15}  /></button></Link>
       }
     </div>

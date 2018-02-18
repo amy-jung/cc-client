@@ -4,8 +4,10 @@ import { HiddenOnlyAuth, VisibleOnlyAuth } from '../wrappers.js'
 import LoginButtonContainer from '../ui/loginbutton/LoginButtonContainer'
 import LogoutButtonContainer from '../ui/logoutbutton/LogoutButtonContainer'
 import ImageSearchBar from './ImageSearchBar'
+import MaterialIcon from 'material-icons-react'
+// const Logo = require('./CC_Logo.png')
 
-export default () => {
+export default ({ isLoggedIn }) => {
   const OnlyAuthLinks = VisibleOnlyAuth(() =>
     <span>
       <li className="pure-menu-item">
@@ -22,15 +24,20 @@ export default () => {
       <LoginButtonContainer />
     </span>
     )
+    console.log(isLoggedIn);
   return (
     <div className='header'>
-      <div className='logo'><h1><Link to="/"></Link></h1></div>
+      <div className='logo'><Link to="/"><img alt='logo' src='/CC_Logo.png'/></Link></div>
       <ImageSearchBar />
       <nav className="navbar">
-          <ul className="menu">
+        { isLoggedIn
+          ? <Link to="/profile" ><MaterialIcon icon='account_circle' /></Link>
+          : <ul className="menu">
             <OnlyGuestLinks />
             <OnlyAuthLinks />
           </ul>
+        }
+          
         </nav>
     </div>
   )

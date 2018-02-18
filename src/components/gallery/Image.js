@@ -11,7 +11,7 @@ export default ({ imageObj = {}, gallery }) => {
     <div className='image'>
       <img src={srcHash} />
       <div className='info-tag-wrapper'>
-        { gallery && <ImageInfoTag hash={userHash} status={isPublic}/> }
+        { gallery && <ImageInfoTag hash={userHash} status={isPublic ? 'Public' : 'Private'}/> }
       </div>
     </div>
   )

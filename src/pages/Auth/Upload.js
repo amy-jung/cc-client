@@ -13,6 +13,14 @@ class Upload extends Component {
     binder(this, ['handleSubmitForm', 'handleTagInputChange', 'handleAddTag', 'renderTags'])
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.initialHash !== this.props.initialHash) {
+      const fromAscii = this.props.web3.fromAscii(this.props.initialHash)
+      console.log(fromAscii.length, fromAscii);
+    }
+  }
+  
+
   handleTagInputChange (e) {
     this.setState({
       tagName: e.target.value
@@ -78,7 +86,9 @@ class Upload extends Component {
 
 function mapStateToProps(state) {
   return {
-    imageURL: state.ipfs.imageURL
+    imageURL: state.ipfs.imageURL,
+    initialHash: state.ipfs.initialHash,
+    web3: state.web3.web3Instance
   }
 }
 

@@ -3,7 +3,8 @@ import ipfsAPI from 'ipfs-api'
 import { UPLOAD_IMAGE } from '../actions/types'
 
 const initialState = {
-  imageURL: ''
+  imageURL: '',
+  initialHash: ''
 }
 
 export default function ipfsReducer(state = initialState, action) {
@@ -13,9 +14,10 @@ export default function ipfsReducer(state = initialState, action) {
       const newState = { ...state }
       const reader = new FileReader();
       reader.onloadend = function() {
-        const ipfs = ipfsAPI('localhost', 5001)
+        const ipfs = ipfsAPI('ipfs.infura.io', 5001, { protocol: 'https' })
+        // const ipfs = ipfsAPI('localhost', 5001)
         const buf = buffer.Buffer(reader.result)
-        console.log(ipfs);
+        // console.log(ipfs);
         ipfs.files.add(buf, (err, result) => {
           if(err) {
             console.error(err)
@@ -24,9 +26,14 @@ export default function ipfsReducer(state = initialState, action) {
           let url = `https://ipfs.io/ipfs/${result[0].hash}`
           console.log(`Url --> ${url}`)
           newState.imageURL = url
+          newState.initialHash = result[0].hash
           return newState
         })
-        reader.readAsArrayBuffer(action.payload)
+        // if (newState.imageURL === '') {
+          reader.readAsArrayBuffer(action.payload)
+        // } else {
+        //   return newState          
+        // }
       }
       const photo = document.getElementById("photo");
       reader.readAsArrayBuffer(action.payload)

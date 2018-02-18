@@ -1,38 +1,38 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { setGalleryFilter, setActiveImage, getWeb3Instance, getImageContract } from '../../utils/redux/actions/'
+import { setGalleryFilter, setActiveImage, getWeb3Instance, getImageContract, uploadImage } from '../../utils/redux/actions/'
 import getWeb3 from '../../utils/web3/getWeb3'
 import ImageGrid from './ImageGrid'
 // import ImageFilters from './ImageFilters'
 // import ImageSearchBar from './ImageSearchBar'
 import ImageDetail from './ImageDetail'
+import Modal from '../layout/Modal'
 import UploadBtn from './UploadBtn'
 import { binder } from '../../utils/'
-
-// all logic for filtering etc in this component
 
 class Gallery extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      imageDetailOpen: false
+      imageDetailOpen: false,
+      uploadModalOpen: true,
+      ipfsURL: ''
     }
-    binder(this, ['generateStockImgArray', 'openImageModal', 'closeImageModal', 'callImageContract'])
+    binder(this, ['generateStockImgArray', 'openImageModal', 'closeImageModal', 'callImageContract', 'handleUploadSubmit'])
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.ipfsURL !== this.state.ipfsURL) {
+      this.setState({
+        ipfsURL: nextProps.ipfsURL
+      })
+    }
   }
 
   componentDidMount () {
-      // 
-    // this.props.onGetWeb3Instance(this.props.web3)    
-    // this.props.getImageContract()
     if ( this.props.web3 ) {
-      
       this.props.onGetImageContract() 
-      // console.log(this.props.imageContract)
-      console.log(this.props.web3);                 
     } else {
-      // this.props.onGetWeb3Instance(this.props.web3)    
-      // this.props.onGetImageContract()   
-    //   console.log('getting web3 now');
       getWeb3.then(res => {
         console.log(res.payload.web3Instance);
         this.props.onGetWeb3Instance(res.payload.web3Instance)        
@@ -42,37 +42,13 @@ class Gallery extends Component {
   }
 
   callImageContract () {
-    // console.log(this.props.imageContract.allImages);
-    // if (this.props.imageContract.allImages) {
-    // const asyncGetEm = async () => {
-    //   const allImages = await this.props.imageContract.allImages.call()
-    //   console.log(allImages);
-    // }
-    // asyncGetEm()
-      // console.log(this.props.imageContract.allImages.call((err,res)=>{ res }));
-
-
-
-      this.props.imageContract.allImages.call((err, res) => {
-        console.log(err)        
-        console.log(res) 
-        // return res
-        // res.forEach(hex => {
-        //   const asciiHex = this.props.web3.toAscii(hex)
-        //   console.log(asciiHex);
-        // })
+    this.props.imageContract.allImages.call((err, res) => { 
+      console.log(res) 
+      res.forEach(hex => {
+        const asciiHex = this.props.web3.toAscii(hex)
+        console.log(asciiHex);
       })
-
-
-
-
-    // }
-    //  else {
-    //   console.log('else');
-    //   this.props.onGetImageContract(this.props.web3)      
-    // }
-
-    // this.props.imageContract.hello.call((err, res) => console.log(err, res))
+    })
   }
 
   generateStockImgArray () {
@@ -84,9 +60,12 @@ class Gallery extends Component {
     }
     const SRC = 'http://via.placeholder.com/400x400'
     const dum = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    // const imgSrcArray = ['https://drive.google.com/file/d/1JSPguvYVzzQXF_ZgTnoT_CwqqE2MDxav/view?usp=sharing', 'https://drive.google.com/file/d/1JSPguvYVzzQXF_ZgTnoT_CwqqE2MDxav/view?usp=sharing', 'https://drive.google.com/file/d/1iKa5OUQZzwDFSnD9KZuz6IWIVQqC4z4b/view?usp=sharing', 'https://drive.google.com/file/d/1Ho2IEVkJjntMdthYKrgktuXij6qqR9wo/view?usp=sharing', 'https://drive.google.com/file/d/12lqc15HVWnDVzta8pwBp-wo-RzTNDl-w/view?usp=sharing', 'https://drive.google.com/file/d/1cfyxBg8ZX5y1fE6yBcbgZNNW2yM-tkhd/view?usp=sharing', 'https://drive.google.com/file/d/1DLT6JVf2HGrRbB6IAYn9zjmN388rHsBo/view?usp=sharing']
+    // const randEx = Math.floor(Math.random(imgSrcArray.length))    
     const imgObjArray = dum.map((o, i) => {
       return {
         srcHash: SRC,
+        // srcHash: imgSrcArray[randEx],
         isPublic: i%2,
         userHash: '0x094u509345039485',
         transactions: [
@@ -108,8 +87,21 @@ class Gallery extends Component {
     this.setState({ imageDetailOpen: false })
   }
 
+  handleUploadSubmit (e, ref) {
+    e.preventDefault()
+    const { files } = ref
+    if (files.length > 0) {
+      console.log(files);
+      this.props.onUploadImage(files[0])
+    }
+  }
+
+
   render () {
     // this.callImageContract()
+    const methods = {
+      upload: this.handleUploadSubmit
+    }
     
     // console.log(this.props.web3);
     return <div className='gallery' style={{ overflow: this.state.imageDetailOpen ? 'hidden' : 'scroll' }}>
@@ -117,10 +109,11 @@ class Gallery extends Component {
         {/* <ImageSearchBar /> */}
         <div className="top-wrapper">
           <div className='copy'>Creative Credit is embedded into each image via the blockchain. No code required. Just download and share!</div>
-          <UploadBtn />
+          <UploadBtn handleUploadClick={this.handleUploadClick} isLoggedIn={this.props.isLoggedIn}/>
         </div>
         <ImageGrid openImageModal={this.openImageModal} searchFilter={this.props.searchFilter} images={this.generateStockImgArray()} />
-        {this.state.imageDetailOpen && <ImageDetail activeImage={this.props.activeImage} close={this.closeImageModal} />}
+        { this.state.imageDetailOpen && <ImageDetail activeImage={this.props.activeImage} close={this.closeImageModal} /> }
+        { this.state.uploadModalOpen && <Modal type='upload' methods={methods} /> }
       </div>
   }
 }
@@ -131,7 +124,9 @@ function mapStateToProps (state) {
     searchFilter: state.gallery.fuzzySearch,
     activeImage: state.gallery.activeImage,
     web3: state.web3.web3Instance,
-    imageContract: state.solidity.imageContract
+    imageContract: state.solidity.imageContract,
+    isLoggedIn: state.user.data !== null,
+    ipfsURL: state.ipfs.ipfsURL,
   }
 }
 
@@ -140,7 +135,8 @@ function mapDispatchToProps (dispatch) {
     onSetGalleryFilter: filter => dispatch(setGalleryFilter(filter)),
     onSetActiveImage: image => dispatch(setActiveImage(image)),
     onGetWeb3Instance: instance => dispatch(getWeb3Instance(instance)),
-    onGetImageContract: () => dispatch(getImageContract())
+    onGetImageContract: () => dispatch(getImageContract()),
+    onUploadImage: imageFile => dispatch(uploadImage(imageFile))
   }
 }
 
