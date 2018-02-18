@@ -321,5 +321,11 @@ a {
 .inbox{
 }
 .inbox-header{
-  padding: 5px
+  padding: 100px 10px 15px 10px
+}
+
+.inbox{
+}
+.inbox-header2{
+  padding: 100px 10px 15px 10px
 }
